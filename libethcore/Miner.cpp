@@ -181,13 +181,18 @@ void Miner::minerLoop()
 {
 
     bool newEpoch, newProgPoWPeriod;
+    WorkPackage current;
+    current.header = h256();
 
     // Don't catch exceptions here !!
     // They will be handled in workLoop implemented in derived class
     while (!shouldStop())
     {
+        // Mark work as consumed
+        m_new_work.store(false, std::memory_order_relaxed);
+
         // Wait for work or 3 seconds (whichever the first)
-        if (!m_new_work.load(memory_order_relaxed))
+        if (!m_work_latest || m_work_latest.header == current.header)
         {
             boost::system_time const timeout =
                 boost::get_system_time() + boost::posix_time::seconds(3);
@@ -195,9 +200,6 @@ void Miner::minerLoop()
             m_new_work_signal.timed_wait(l, timeout);
             continue;
         }
-
-        // Got new work
-        m_new_work.store(false, memory_order_relaxed);
 
         if (shouldStop())  // Exit ! Request to terminate
             break;
@@ -222,8 +224,9 @@ void Miner::minerLoop()
             // As DAG generation takes a while we need to
             // ensure we're on latest job, not on the one
             // which triggered the epoch change
-            if (m_new_work.load(memory_order_relaxed))
-                continue;
+            current = m_work_latest;
+            current.header = h256();
+            continue;
         }
 
         if (m_work_active.algo == "ethash")

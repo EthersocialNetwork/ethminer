@@ -202,7 +202,8 @@ void CPUMiner::ethash_search()
     while (true)
     {
         // Exit next time around if there's new work awaiting
-        if (m_new_work.load(memory_order_relaxed) || paused() || shouldStop())
+        bool t = true;
+        if (m_new_work.compare_exchange_strong(t, false) || paused() || shouldStop())
             break;
 
         auto r = ethash::search(
@@ -240,7 +241,8 @@ void dev::eth::CPUMiner::progpow_search()
     while (true)
     {
         // Exit next time around if there's new work awaiting
-        if (m_new_work.load(memory_order_relaxed))
+        bool t = true;
+        if (m_new_work.compare_exchange_strong(t, false) || paused() || shouldStop())
             break;
 
         auto r = progpow::search(context, m_work_active.block, header, boundary,

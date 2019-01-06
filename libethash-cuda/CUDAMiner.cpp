@@ -424,6 +424,9 @@ void CUDAMiner::ethash_search()
 
     while (!done)
     {
+        // Exit next time around if there's new work awaiting
+        done = m_new_work.load(memory_order_relaxed);
+
         // This inner loop will process each cuda stream individually
         for (current_index = 0; current_index < m_settings.streams;
              current_index++, startNonce += m_batch_size)
@@ -439,9 +442,11 @@ void CUDAMiner::ethash_search()
             // Update the hash rate
             updateHashRate(m_batch_size, 1);
 
-            // Check on every stream if we need to stop
-            if (!done)
-                done = m_new_work.load(memory_order_relaxed);
+            if (shouldStop())
+            {
+                m_new_work.store(false, memory_order_relaxed);
+                done = true;
+            }
 
             // Detect solutions in current stream's solution buffer
             volatile search_results& buffer(*m_search_results[current_index]);
@@ -526,6 +531,9 @@ void CUDAMiner::progpow_search()
 
     while (!done)
     {
+        // Exit next time around if there's new work awaiting
+        done = m_new_work.load(memory_order_relaxed);
+
         // This inner loop will process each cuda stream individually
         for (current_index = 0; current_index < m_settings.streams;
              current_index++, startNonce += m_batch_size)
@@ -541,9 +549,11 @@ void CUDAMiner::progpow_search()
             // Update the hash rate
             updateHashRate(m_batch_size, 1);
 
-            // Check on every stream if we need to stop
-            if (!done)
-                done = m_new_work.load(memory_order_relaxed);
+            if (shouldStop())
+            {
+                m_new_work.store(false, memory_order_relaxed);
+                done = true;
+            }
 
             // Detect solutions in current stream's solution buffer
             volatile search_results* buffer = m_search_results[current_index];

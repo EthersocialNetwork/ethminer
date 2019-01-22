@@ -169,8 +169,8 @@ typedef struct {
 typedef struct
 {
     uint count;
-    uint abort;
     uint rounds;
+    uint abort;
     struct
     {
         // One word for gid and 8 for mix hash
@@ -273,7 +273,7 @@ __kernel void progpow_search(
         return;
 
     atomic_inc(&g_output->abort);
-    g_output->result[slot].nonce = nonce;
+    g_output->result[slot].nonce = gid + start_nonce;
 
     #pragma unroll
     for (int i = 0; i < 8; i++)

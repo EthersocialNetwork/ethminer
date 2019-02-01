@@ -302,6 +302,15 @@ bool Farm::start()
                     new CPUMiner(m_miners.size(), m_CPSettings, it->second)));
             }
 #endif
+#if ETH_ETHASHCPU
+
+            if (it->second.subscriptionType == DeviceSubscriptionTypeEnum::Cpu)
+            {
+                minerTelemetry.prefix = "cp";
+                m_miners.push_back(std::shared_ptr<Miner>(
+                    new CPUMiner(m_miners.size(), m_CPSettings, it->second)));
+            }
+#endif
             if (minerTelemetry.prefix.empty())
                 continue;
             m_telemetry.miners.push_back(minerTelemetry);
@@ -537,9 +546,10 @@ void Farm::submitProofAsync(Solution const& _s)
                      "frequently.";
             return;
         }
+        m_onSolutionFound(Solution{_s.nonce, r.mixHash, _s.work, _s.tstamp, _s.midx});
     }
-
-    m_onSolutionFound(_s);
+    else
+        m_onSolutionFound(_s);
 
 #ifdef _DEVELOPER
     if (g_logOptions & LOG_SUBMIT)

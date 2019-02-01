@@ -60,5 +60,7 @@ find_library(CUDA_cuda_LIBRARY NAMES cuda PATHS ${CUDA_TOOLKIT_ROOT_DIR} PATH_SU
 target_link_libraries(ethash-cuda ethcore ethash::ethash progpow)
 target_link_libraries(ethash-cuda ${CUDA_nvrtc_LIBRARY} ${CUDA_cuda_LIBRARY})
 
+cuda_add_library(ethash-cuda STATIC ${sources} ${headers})
+target_link_libraries(ethash-cuda ethcore ethash::ethash Boost::thread)
 target_include_directories(ethash-cuda PUBLIC ${CUDA_INCLUDE_DIRS})
 target_include_directories(ethash-cuda PRIVATE .. ${CMAKE_CURRENT_BINARY_DIR})

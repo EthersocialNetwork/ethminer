@@ -497,6 +497,7 @@ void CLMiner::compileProgPoWKernel(uint32_t _seed, uint32_t _dagelms)
         else
             fileName = "kernel-" + m_deviceDescriptor.name + "-" + to_string(_seed) + ".cl.bin";
 
+
 #ifdef _WIN32
         tmpDir = getenv("TEMP");
         tmpDir.append("\\");

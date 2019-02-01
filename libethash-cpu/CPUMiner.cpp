@@ -151,14 +151,6 @@ CPUMiner::CPUMiner(unsigned _index, CPSettings _settings, DeviceDescriptor& _dev
 }
 
 
-CPUMiner::~CPUMiner()
-{
-    DEV_BUILD_LOG_PROGRAMFLOW(cpulog, "cp-" << m_index << " CPUMiner::~CPUMiner() begin");
-    stopWorking();
-    kick_miner();
-    DEV_BUILD_LOG_PROGRAMFLOW(cpulog, "cp-" << m_index << " CPUMiner::~CPUMiner() end");
-}
-
 
 /*
  * Bind the current thread to a spcific CPU

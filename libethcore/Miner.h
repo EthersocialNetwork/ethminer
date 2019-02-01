@@ -128,15 +128,9 @@ struct CLSettings : public MinerSettings
 };
 
 // Holds settings for CPU Miner
-struct CPSettings
-{
-    vector<unsigned> devices;
-    unsigned batchSize = 30U;
-};
-
-// Holds settings for CPU Miner
 struct CPSettings : public MinerSettings
 {
+    unsigned batchSize = 30U;
 };
 
 struct SolutionAccountType

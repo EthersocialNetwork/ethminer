@@ -546,7 +546,7 @@ void Farm::submitProofAsync(Solution const& _s)
                      "frequently.";
             return;
         }
-        m_onSolutionFound(Solution{_s.nonce, r.mixHash, _s.work, _s.tstamp, _s.midx});
+        m_onSolutionFound(_s);
     }
     else
         m_onSolutionFound(_s);

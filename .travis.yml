@@ -82,7 +82,7 @@ before_install:
 script: |
     cmake -DHUNTER_JOBS_NUMBER=4 -DCUDA=$CUDA -DOPENCL=ON -DAPI=ON -H. -Bbuild
     cmake --build build --target package -- -j4
-    build/ethminer/ethminer --help
+    #build/ethminer/ethminer --help
     if [ "$TRAVIS_OS_NAME" = linux ]; then ldd -v build/ethminer/ethminer; fi
     if [ "$TRAVIS_OS_NAME" = osx ]; then otool -L build/ethminer/ethminer; fi
     . build/ethminer/buildinfo.sh
@@ -93,7 +93,7 @@ script: |
 deploy:
   - provider: releases
     api_key:
-      secure: "Kf5OgSTjPpZmUWElst54vlxEVgTQCYffFgrJ+NPa6JDaeEHpdJgH1Q/ZdVhcRUbZCIIVg5FY8iVnkTLXXyh6qkWZdrGvRpdst+JIwr4SZZGmpDjKNvHxXmICwOYumasuS7dDvjPwPx2LvUqjc2RNXloMl9EmtvO87vxAcuVr5FA3pps7GVmHGkSfFSrqtjnd43O00Zj9HDL5Vpr/CkuVWLCLCgFoFMANNc5fJhK8LyCYswoi2KaVcqmDPKtTU5FYXoPOU/8qoeLY6pVeknIqdZSOdGBejj/MWfOpBz7CQCo5NSqYoglpf08GoBWZagV1uCweZSQbO3vKc5UcPnwLSaS69dXR0LMYhjLYPlEWqs8Lha3Img76+pdUJeJgEyPL4YDsloaKonEQENk/lvUZwVqqSCy5E2Ru6xYPwh+nTiPF8ZRKmhoJGmc8pFqpJRj3eVQcqFCvDK8YjlJmoPWgasJMbzejrH64XHcrlLWVPTTYZyVMZbGs5eD+SLkeUVjDFQ92zkqME92TaEUP5lhFojeVt1x9f+0dScambuOv0SAy8DYXUWHDjHSajJFnov9se+aeKC1H24XuWcTzWg6pXBLmasmi4KooXXZjisbp/E32uBJDWGgGkWq54QyBHnIwW6IeSD2nCTLX3HW1VNgNAIxeUB7d1hhtWetAAoEn7TA="
+      secure: "QPFJWi5YMdzPUMntN2OvH57of4/XF39M/H0SklUTRD/r9dd7lkWp+4vQ7KHncfYqOYzqw75wRKEcZcitjkBuwuoT8uLw6jNkB9lt3UG6J8KVWmOlKpo+D1eHC3aD0XWvRbF7q8vpeDRc08NJoLBW3AKd5jKEd8RF/6P+rc8htg9+Z162ZsUD/WjNh+gn7uMX8PVObxYueP8b1cCjHw2CVIEvgHu3vY9N9pvaoolOXxl8Px+7Zwu1S4OMP/DfcYv/sVbjshIQPhDH6YfjN1za4Ee0lP7tX0MdNzmQEOwn2IDFPZ+2DjAgQbO8HogQNtf1vfbGsVx/4J8fMWojeAjqjZqDwPat+/jLqTRalYAObdlJlO0YCH07H4jLYEHUuMGjxLs7OPJK+sSTtGhPKeaRr+3AlSkUnwrhLyPTNhX/Ja00FIslZfhoQXD/HLeiALvl0wkYXwqXuB405puwREuxSW1RmKb47QjgLxv+FNP4wXrKe9ayc+BAywXNiMCbMLPWbCr+npeeFE3L0TsXM2cVAC8j1rvWLGN861UqvsE35kudA6bnohOkSRVFoMhNfcyjXnbWaUOIUnrZS0jpAKKeC4asIjp8O+rd/9GvNU0sKMZQ+RTYJM/pMn2iOGTgV0A1OcGaRF26SRyBHpuj5gKjnSP0/qqMdeZ3WCzsq8thwWY="
     file_glob: true
     file: package/*
     skip_cleanup: true

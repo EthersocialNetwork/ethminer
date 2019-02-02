@@ -31,10 +31,20 @@ matrix:
           env:
               - CUDA=ON
               - CUDA_VERSION=8
+        - os: linux
+          dist: trusty
+          sudo: required
+          env:
+              - CUDA=OFF
         - os: osx
           osx_image: xcode9.2
           env:
               - CUDA=ON
+              - CUDA_VERSION=9
+        - os: osx
+          osx_image: xcode9.2
+          env:
+              - CUDA=OFF
               - CUDA_VERSION=9
 cache:
     directories:
@@ -52,7 +62,7 @@ before_install:
       sudo apt-get -q update
       sudo apt-get -qy install g++-6
       scripts/install_cmake.sh
-      . scripts/install-cuda-ubuntu1604.sh $CUDA_VERSION
+      [ "$CUDA" = "ON" ] && . scripts/install-cuda-ubuntu1604.sh $CUDA_VERSION
       pyenv global 3.6
       pip install --user requests gitpython
       if [ "$CUDA_VERSION" = "8" ]; then
@@ -85,7 +95,8 @@ script: |
     if [ "$TRAVIS_OS_NAME" = osx ]; then otool -L build/ethminer/ethminer; fi
     . build/ethminer/buildinfo.sh
     mkdir package
-    mv build/ethminer.tar.gz package/$PROJECT_NAME-$PROJECT_VERSION-cuda-$CUDA_VERSION-$SYSTEM_NAME-$SYSTEM_PROCESSOR.tar.gz
+    if [ "$CUDA" = "ON" ]; then TAG=cuda-$CUDA_VERSION; else TAG=opencl; fi
+    mv build/ethminer.tar.gz package/$PROJECT_NAME-$PROJECT_VERSION-$TAG-$SYSTEM_NAME-$SYSTEM_PROCESSOR.tar.gz
 
 
 deploy:

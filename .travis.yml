@@ -31,10 +31,20 @@ matrix:
           env:
               - CUDA=ON
               - CUDA_VERSION=8
+        - os: linux
+          dist: trusty
+          sudo: required
+          env:
+              - CUDA=OFF
         - os: osx
           osx_image: xcode9.2
           env:
               - CUDA=ON
+              - CUDA_VERSION=9
+        - os: osx
+          osx_image: xcode9.2
+          env:
+              - CUDA=OFF
               - CUDA_VERSION=9
 cache:
     directories:
@@ -52,7 +62,7 @@ before_install:
       sudo apt-get -q update
       sudo apt-get -qy install g++-6
       scripts/install_cmake.sh
-      . scripts/install-cuda-ubuntu1604.sh $CUDA_VERSION
+      [ "$CUDA" = "ON" ] && . scripts/install-cuda-ubuntu1604.sh $CUDA_VERSION
       pyenv global 3.6
       pip install --user requests gitpython
       if [ "$CUDA_VERSION" = "8" ]; then
@@ -64,11 +74,13 @@ before_install:
         export CXX=g++-6
       fi
     elif [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      if [ "$CUDA" = "ON" ]; then
       curl -L https://developer.nvidia.com/compute/cuda/9.2/Prod2/local_installers/cuda_9.2.148_mac -o $HOME/cuda_9.2.148_mac.dmg
       hdiutil mount $HOME/cuda_9.2.148_mac.dmg
       sleep 5
       ls -ltr /Volumes/CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/MacOS
       sudo /Volumes/CUDAMacOSXInstaller/CUDAMacOSXInstaller.app/Contents/MacOS/CUDAMacOSXInstaller --accept-eula --no-window; export BREW_STATUS=$?
+      fi
       echo "Brew status $BREW_STATUS"
       if [ $BREW_STATUS -ne 0 ]; then
         echo "Brew Failed"
@@ -80,12 +92,13 @@ before_install:
 script: |
     cmake -DHUNTER_JOBS_NUMBER=4 -DCUDA=$CUDA -DOPENCL=ON -DAPI=ON -H. -Bbuild
     cmake --build build --target package -- -j4
-    build/ethminer/ethminer --help
+    [ "$CUDA" = "OFF" ] && build/ethminer/ethminer --help
     if [ "$TRAVIS_OS_NAME" = linux ]; then ldd -v build/ethminer/ethminer; fi
     if [ "$TRAVIS_OS_NAME" = osx ]; then otool -L build/ethminer/ethminer; fi
     . build/ethminer/buildinfo.sh
     mkdir package
-    mv build/ethminer.tar.gz package/$PROJECT_NAME-$PROJECT_VERSION-cuda-$CUDA_VERSION-$SYSTEM_NAME-$SYSTEM_PROCESSOR.tar.gz
+    if [ "$CUDA" = "ON" ]; then TAG=cuda-$CUDA_VERSION; else TAG=opencl; fi
+    mv build/ethminer.tar.gz package/$PROJECT_NAME-$PROJECT_VERSION-$TAG-$SYSTEM_NAME-$SYSTEM_PROCESSOR.tar.gz
 
 
 deploy:

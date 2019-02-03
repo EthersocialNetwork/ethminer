@@ -102,10 +102,14 @@ enum class SolutionAccountingEnum
     Failed
 };
 
-// Holds settings for CUDA Miner
-struct CUSettings
+struct MinerSettings
 {
     vector<unsigned> devices;
+};
+
+// Holds settings for CUDA Miner
+struct CUSettings : public MinerSettings
+{
     unsigned streams = 2;
     unsigned schedule = 4;
     unsigned gridSize = 2048;
@@ -114,19 +118,18 @@ struct CUSettings
 };
 
 // Holds settings for OpenCL Miner
-struct CLSettings
+struct CLSettings : public MinerSettings
 {
-    vector<unsigned> devices;
     bool noBinary = false;
+    bool noExit = false;
     unsigned globalWorkSize = 0;
     unsigned globalWorkSizeMultiplier = 32768;
     unsigned localWorkSize = 256;
 };
 
 // Holds settings for CPU Miner
-struct CPSettings
+struct CPSettings : public MinerSettings
 {
-    vector<unsigned> devices;
     unsigned batchSize = 30U;
 };
 
@@ -298,7 +301,7 @@ struct TelemetryType
         }
 
         _ret << EthTealBold << std::fixed << std::setprecision(2) << hr << " "
-             << suffixes[magnitude] << EthReset << " { ";
+             << suffixes[magnitude] << EthReset << " - ";
 
         int i = -1;                 // Current miner index
         int m = miners.size() - 1;  // Max miner index
@@ -321,9 +324,8 @@ struct TelemetryType
 
             // Separator if not the last miner index
             if (i < m)
-                _ret << " | ";
+                _ret << ", ";
         }
-        _ret << " }";
 
         return _ret.str();
     };

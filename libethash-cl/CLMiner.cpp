@@ -1153,9 +1153,6 @@ void CLMiner::progpow_search()
                 m_queue.enqueueReadBuffer(
                     m_searchBuffer, CL_FALSE, 0, sizeof(search_results), (void*)&results);
 
-                // We actually measure the amount of time needed for the previous kernel to
-                // complete up to moment it gave results back. On first loop after initialization
-                // of the miner we take a sample and then we continue to keep an EMA of the time
 
                 if (m_progpow_search_kernel_time)
                 {

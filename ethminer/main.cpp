@@ -338,6 +338,8 @@ public:
 
         app.add_flag("--cl-list-platforms", m_shouldListClPlatforms, "");
 
+        app.add_flag("--cl-noexit", m_CLSettings.noExit, "");
+
 #endif
 
 #if _CUDA
@@ -363,6 +365,12 @@ public:
 #endif
 
 #if _CPU
+
+        app.add_option("--cpu-devices,--cp-devices", m_CPSettings.devices, "");
+
+#endif
+
+#if ETH_ETHASHCPU
 
         app.add_option("--cpu-devices,--cp-devices", m_CPSettings.devices, "");
 
@@ -956,7 +964,8 @@ public:
                  << "                        Set the local work size" << endl
                  << "    --cl-nobin          FLAG" << endl
                  << "                        Use openCL kernel. Do not load binary kernel" << endl
-                 << endl;
+                 << "    --cl-noexit         FLAG" << endl
+                 << "                        Don't use fast exit algorithm" << endl;
         }
 
         if (ctx == "cu")
@@ -1005,6 +1014,20 @@ public:
             cout << "CPU Extended Options :" << endl
                  << endl
                  << "    Use this extended CPU arguments" << endl
+                 << endl
+                 << "    --cp-devices        UINT {} Default not set" << endl
+                 << "                        Space separated list of device indexes to use" << endl
+                 << "                        eg --cp-devices 0 2 3" << endl
+                 << "                        If not set all available CPUs will be used" << endl
+                 << endl;
+        }
+
+        if (ctx == "cp")
+        {
+            cout << "CPU Extended Options :" << endl
+                 << endl
+                 << "    Use this extended CPU arguments"
+                 << endl
                  << endl
                  << "    --cp-devices        UINT {} Default not set" << endl
                  << "                        Space separated list of device indexes to use" << endl

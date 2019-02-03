@@ -21,6 +21,10 @@
 #define LEGACY
 #endif
 
+#ifdef cl_clang_storage_class_specifiers
+#pragma OPENCL EXTENSION cl_clang_storage_class_specifiers : enable
+#endif
+
 #if defined(cl_amd_media_ops)
 #pragma OPENCL EXTENSION cl_amd_media_ops : enable
 #elif defined(cl_nv_pragma_unroll)
@@ -163,11 +167,10 @@ static __constant uint2 const Keccak_f1600_RC[24] = {
  } while(0)
 
 
-#define KECCAK_PROCESS(st, in_size, out_size, isolate)    do { \
+#define KECCAK_PROCESS(st, in_size, out_size)    do { \
     for (int r = 0; r < 24; ++r) { \
         int os = (r < 23 ? 25 : (out_size));\
-        if (isolate) \
-            KECCAKF_1600_RND(st, r, os); \
+        KECCAKF_1600_RND(st, r, os); \
     } \
 } while(0)
 
@@ -262,9 +265,12 @@ __kernel void ethash_search(
 )
 {
 
+#ifdef FAST_EXIT
     if (g_output->abort)
         return;
-    else if (get_local_id(0) == 0)
+    else
+#endif
+    if (get_local_id(0) == 0)
         atomic_inc(&g_output->rounds);
 
     __global hash128_t const* g_dag = (__global hash128_t const*) _g_dag;
@@ -312,7 +318,7 @@ __kernel void ethash_search(
     uint2 mixhash[4];
 
     for (int pass = 0; pass < 2; ++pass) {
-        KECCAK_PROCESS(state, select(5, 12, pass != 0), select(8, 1, pass != 0), isolate);
+        KECCAK_PROCESS(state, select(5, 12, pass != 0), select(8, 1, pass != 0));
         if (pass > 0)
             break;
 
@@ -339,12 +345,10 @@ __kernel void ethash_search(
 
             barrier(CLK_LOCAL_MEM_FENCE);
 
-#ifdef LEGACY
-            for (uint a = 0; a < (ACCESSES & isolate); a += 8) {
-#else
+#ifndef LEGACY
 #pragma unroll 1
-            for (uint a = 0; a < ACCESSES; a += 8) {
 #endif
+            for (uint a = 0; a < ACCESSES; a += 8) {
                 const uint lane_idx = 4 * hash_id + a / 8 % 4;
                 for (uint x = 0; x < 8; ++x)
                     MIX(x);
@@ -389,7 +393,9 @@ __kernel void ethash_search(
 
     if (as_ulong(as_uchar8(state[0]).s76543210) < *target) {
         
+#ifdef FAST_EXIT
         atomic_inc(&g_output->abort);
+#endif
 
         uint slot = atomic_inc(&g_output->count);
         if (slot < MAX_SEARCH_RESULTS) 
@@ -413,19 +419,19 @@ typedef union _Node {
     uint4 dqwords[4];
 } Node;
 
-static void SHA3_512(uint2 *s, uint isolate)
+static void SHA3_512(uint2 *s)
 {
     uint2 st[25];
 
     for (uint i = 0; i < 8; ++i)
         st[i] = s[i];
 
-    for (uint i = 8; i != 25; ++i)
+    st[8] = (uint2)(0x00000001, 0x80000000);
+
+    for (uint i = 9; i != 25; ++i)
         st[i] = (uint2)(0);
 
-    st[8].x = 0x00000001;
-    st[8].y = 0x80000000;
-    KECCAK_PROCESS(st, 8, 8, isolate);
+    KECCAK_PROCESS(st, 8, 8);
 
     for (uint i = 0; i < 8; ++i)
         s[i] = st[i];
@@ -441,7 +447,7 @@ __kernel void ethash_calculate_dag_item(uint start, __global const uint16* _Cach
     Node DAGNode = Cache[NodeIdx % light_size];
 
     DAGNode.dwords[0] ^= NodeIdx;
-    SHA3_512(DAGNode.qwords, isolate);
+    SHA3_512(DAGNode.qwords);
 
     for (uint i = 0; i < 256; ++i) {
         uint ParentIdx = fnv(NodeIdx ^ i, DAGNode.dwords[i & 15]) % light_size;
@@ -449,14 +455,12 @@ __kernel void ethash_calculate_dag_item(uint start, __global const uint16* _Cach
 
 #pragma unroll
         for (uint x = 0; x < 4; ++x) {
-            if (isolate) {
                 DAGNode.dqwords[x] *= (uint4)(FNV_PRIME);
                 DAGNode.dqwords[x] ^= ParentNode->dqwords[x];
-            }
         }
     }
 
-    SHA3_512(DAGNode.qwords, isolate);
+    SHA3_512(DAGNode.qwords);
 
     //if (NodeIdx < DAG_SIZE)
     DAG[NodeIdx] = DAGNode;

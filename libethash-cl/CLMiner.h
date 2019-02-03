@@ -58,14 +58,14 @@ namespace eth
 // ethash.cl
 typedef struct
 {
-    uint32_t count;
-    uint32_t abort;
-    uint32_t rounds;
+    cl_uint count;
+    cl_uint rounds;
+    cl_uint abort;
     struct
     {
         // 64-bit nonce and 8 words for mix hash
-        uint64_t nonce;
-        uint32_t mix[8];
+        cl_ulong nonce;
+        cl_uint mix[8];
     } result[MAX_SEARCH_RESULTS];
 } search_results;
 

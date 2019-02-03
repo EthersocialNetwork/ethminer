@@ -169,8 +169,8 @@ typedef struct {
 typedef struct
 {
     uint count;
-    uint abort;
     uint rounds;
+    uint abort;
     struct
     {
         // One word for gid and 8 for mix hash

@@ -243,8 +243,8 @@ do { \
 typedef struct
 {
     uint count;
-    uint rounds;
     uint abort;
+    uint rounds;
     struct
     {
         // One word for gid and 8 for mix hash

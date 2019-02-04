@@ -59,8 +59,8 @@ namespace eth
 typedef struct
 {
     cl_uint count;
-    cl_uint rounds;
     cl_uint abort;
+    cl_uint rounds;
     struct
     {
         // 64-bit nonce and 8 words for mix hash

@@ -1,14 +1,35 @@
 SDIR=./isa
 BUILD=./bin
 
+# NOTE: This struct must match the one defined in CLMiner.cpp
+# typedef struct
+# {
+#     cl_uint count;
+#     cl_uint abort;
+#     cl_uint rounds;
+#     struct
+#     {
+#         // 64-bit nonce and 8 words for mix hash
+#         cl_ulong nonce;
+#         cl_uint mix[8];
+#     } result[MAX_SOLTNS];
+# } search_results;
+
 MAX_SOLUTIONS_PER_GLOBAL_WORK_GROUP=4
 RESULT_STRUCT_SIZE=40
 FIRST_RESULT_OFFSET=16
+COUNT_OFFSET=0
+ABORT_OFFSET=4
+ROUNDS_OFFSET=8
+
 
 ASFLAGS=-I$(SDIR) \
 	-DMAX_SOLTNS=$(MAX_SOLUTIONS_PER_GLOBAL_WORK_GROUP) \
 	-DRESULT_SIZE=$(RESULT_STRUCT_SIZE) \
-	-DRESULT_OFFSET=$(FIRST_RESULT_OFFSET)
+	-DRESULT_OFFSET=$(FIRST_RESULT_OFFSET) \
+	-DCOUNT_OFFSET=$(COUNT_OFFSET) \
+	-DROUNDS_OFFSET=$(ROUNDS_OFFSET) \
+	-DABORT_OFFSET=$(ABORT_OFFSET)
 
 AS=clrxasm
 

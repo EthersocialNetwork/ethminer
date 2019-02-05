@@ -370,12 +370,6 @@ public:
 
 #endif
 
-#if ETH_ETHASHCPU
-
-        app.add_option("--cpu-devices,--cp-devices", m_CPSettings.devices, "");
-
-#endif
-
         app.add_flag("--noeval", m_FarmSettings.noEval, "");
 
         app.add_option("-L,--dag-load-mode", m_FarmSettings.dagLoadMode, "", true)
@@ -1014,20 +1008,6 @@ public:
             cout << "CPU Extended Options :" << endl
                  << endl
                  << "    Use this extended CPU arguments" << endl
-                 << endl
-                 << "    --cp-devices        UINT {} Default not set" << endl
-                 << "                        Space separated list of device indexes to use" << endl
-                 << "                        eg --cp-devices 0 2 3" << endl
-                 << "                        If not set all available CPUs will be used" << endl
-                 << endl;
-        }
-
-        if (ctx == "cp")
-        {
-            cout << "CPU Extended Options :" << endl
-                 << endl
-                 << "    Use this extended CPU arguments"
-                 << endl
                  << endl
                  << "    --cp-devices        UINT {} Default not set" << endl
                  << "                        Space separated list of device indexes to use" << endl

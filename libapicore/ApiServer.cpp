@@ -1034,8 +1034,9 @@ Json::Value ApiConnection::getMinerStatDetailPerMiner(
     DeviceDescriptor minerDescriptor = _miner->getDescriptor();
 
     jRes["_index"] = _index;
-    jRes["_mode"] =
-        (minerDescriptor.subscriptionType == DeviceSubscriptionTypeEnum::Cuda ? "CUDA" : "OpenCL");
+    jRes["_mode"] = (minerDescriptor.subscriptionType == DeviceSubscriptionTypeEnum::Cuda ?
+                         "CUDA" :
+                         (minerDescriptor.clBinaryKernel ? "AMD Kernel" : "OpenCL"));
 
     /* Hardware Info */
     Json::Value hwinfo;
@@ -1139,11 +1140,11 @@ std::string ApiConnection::getHttpMinerStatDetail()
          << "<th>Device</th>"
          << "<th>Mode</th>"
          << "<th>Paused</th>"
-         << "<th class=right>Hash Rate</th>"
-         << "<th class=right>Solutions</th>"
-         << "<th class=right>Temp.</th>"
-         << "<th class=right>Fan %</th>"
-         << "<th class=right>Power</th>"
+         << "<th>Hash Rate</th>"
+         << "<th>Solutions</th>"
+         << "<th>Temp.</th>"
+         << "<th>Fan %</th>"
+         << "<th>Power W</th>"
          << "</tr>"
          << "</thead><tbody>";
 
@@ -1174,21 +1175,21 @@ std::string ApiConnection::getHttpMinerStatDetail()
                                                        "No")
              << "</td>";
 
-        _ret << "<td class=right>" << dev::getFormattedHashes(hashrate) << "</td>";
+        _ret << "<td>" << dev::getFormattedHashes(hashrate) << "</td>";
 
-        _ret << "<td class=right>" << device["mining"]["shares"][0].asString() << "</td>";
-        _ret << "<td class=right>" << device["hardware"]["sensors"][0].asString() << "</td>";
-        _ret << "<td class=right>" << device["hardware"]["sensors"][1].asString() << "</td>";
-        _ret << "<td class=right>" << setprecision(2) << power << "</td>";
+        _ret << "<td>" << device["mining"]["shares"][0].asString() << "</td>";
+        _ret << "<td>" << device["hardware"]["sensors"][0].asString() << "</td>";
+        _ret << "<td>" << device["hardware"]["sensors"][1].asString() << "</td>";
+        _ret << "<td>" << setprecision(2) << power << "</td>";
 
         _ret << "</tr>";  // Close row
     }
     _ret << "</tbody>";
 
     /* Summarize */
-    _ret << "<tfoot><tr class=bg-header0><td colspan=4 class=right>Total</td><td class=right>"
-         << dev::getFormattedHashes(total_hashrate) << "</td><td class=right>" << total_solutions
-         << "</td><td colspan=3 class=right>" << setprecision(2) << total_power << "</td></tfoot>";
+    _ret << "<tfoot><tr class=bg-header0><td colspan=4 class=right>Totals&nbsp;&nbsp;</td><td>"
+         << dev::getFormattedHashes(total_hashrate) << "</td><td>" << total_solutions
+         << "</td><td colspan=2></td><td>" << setprecision(2) << total_power << "</td></tfoot>";
 
     _ret << "</table></body></html>";
     return _ret.str();

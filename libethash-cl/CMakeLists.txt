@@ -9,6 +9,10 @@ add_custom_command(
     -DBIN2H_SOURCE_FILE="${CMAKE_CURRENT_SOURCE_DIR}/ethash_miner_kernel.cl"
     -DBIN2H_VARIABLE_NAME="cl_ethash_miner_kernel"
     -DBIN2H_HEADER_FILE="${CMAKE_CURRENT_BINARY_DIR}/ethash_miner_kernel.cpp"
+    -DBIN2H_REMOVE_LEADING_WHITESPACE=1
+    -DBIN2H_REMOVE_TRAILING_WHITESPACE=1
+    -DBIN2H_REMOVE_EMPTY_LINES=1
+    -DBIN2H_CONDENSE_WHITESPACE=1
     -P "${CMAKE_CURRENT_SOURCE_DIR}/bin2h.cmake"
     COMMENT "Generating OpenCL Ethash Kernel Byte Array"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/ethash_miner_kernel.cl"
@@ -20,6 +24,10 @@ add_custom_command(
     -DBIN2H_SOURCE_FILE="${CMAKE_CURRENT_SOURCE_DIR}/progpow_miner_kernel.cl"
     -DBIN2H_VARIABLE_NAME="cl_progpow_miner_kernel"
     -DBIN2H_HEADER_FILE="${CMAKE_CURRENT_BINARY_DIR}/progpow_miner_kernel.cpp"
+    -DBIN2H_REMOVE_LEADING_WHITESPACE=1
+    -DBIN2H_REMOVE_TRAILING_WHITESPACE=1
+    -DBIN2H_REMOVE_EMPTY_LINES=1
+    -DBIN2H_CONDENSE_WHITESPACE=1
     -P "${CMAKE_CURRENT_SOURCE_DIR}/bin2h.cmake"
     COMMENT "Generating OpenCL ProgPoW Kernel Byte Array"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/progpow_miner_kernel.cl"
